@@ -10,7 +10,7 @@ void handleUpdates();
 void outputState();
 int handleEncounters();
 void handlePlayerChoice();
-
+void playerPicksUpWeaponIfNotOwned();
 char * getRoomText();
 char * getAvailableDirections();
 int handleMonsterEncounter();
@@ -21,17 +21,11 @@ int checkIfMonsterAttacks();
 void escapeAttempt(int *combatEnded);
 void attackAttempt(int *combatEnded);
 
-//
-void save(struct Player player);
-int load(struct Player * player );
-//
-
-
 //Room coordinates are x,y,
 const int playerX = 1;
 const int playerY = 0;
 const int playerLives = 100;
-
+static int weaponPickedUp = 0;
 struct Player {
     int XLocation;
     int YLocation;
@@ -43,6 +37,7 @@ static struct Player player;
 static int healingRegen = 0;
 static int turns = 0;
 static int monsterLives = 200;
+static int secondMonsterLives = 100;
 
 static char directionNames[4][10]  = {
    "(u)p",
@@ -111,7 +106,6 @@ int executeTurn(){
     turns++;
     //handle any uptades, that have to happen each turn
     handleUpdates();
-
     //output details about player's status: lives, location, etc.
     outputState();
 
@@ -120,8 +114,6 @@ int executeTurn(){
     if(gameOver > 0){
         return 1;
     }
-
-
     //give player a choice for further exploration
     handlePlayerChoice();
     return 0;
@@ -171,7 +163,13 @@ void outputState(){
 
 
 }
+void playerPicksUpWeaponIfNotOwned(){
+    if(weaponPickedUp == 0){
+        printf("\nIts dangerous to go alone. Take this\n");
+        weaponPickedUp = 1;
+    }
 
+}
 
 //Decide any encounters that should happen in the given room.
 int handleEncounters(){
@@ -179,6 +177,8 @@ int handleEncounters(){
         case 0:
             switch(player.YLocation){
                 case 0:
+                    playerPicksUpWeaponIfNotOwned();
+
                 break;
                 case 1:
                 break;
@@ -249,7 +249,6 @@ void handlePlayerChoice(){
              printf("\nYou cannot go there");
            }
         break;
-
         //l - left
         case 108:
            if(availableDirections[player.XLocation][player.YLocation][3]){
@@ -258,17 +257,6 @@ void handlePlayerChoice(){
            } else{
              printf("\nYou cannot go there");
            }
-        break;
-        //s - save
-        case 115:
-            save(player);
-
-        break;
-
-        //o - open
-        case 111:
-            player = load();
-
         break;
 
         default:
@@ -282,12 +270,7 @@ int getPlayerChoice(){
     char selected;
     char* availableDirections;
     availableDirections  = getAvailableDirections();
-
-    strcat(availableDirections, "\n(s) to save \n(o) to load"   );
-
-    printf("\n %s \n  Where will you go? Choose wisely:  ",availableDirections);
-
-
+    printf("\n%s\nWhere will you go? Choose wisely:  ",availableDirections);
     scanf(" %c", &selected);
     return (int)selected;
 }
@@ -406,7 +389,13 @@ void attackAttempt(int *combatEnded){
     randomResult = rand() % 6;
     if(randomResult > 1){
         printf("You have succeeded in hitting the monster without harm!\n");
-        monsterLives -= 20;
+       
+        if(weaponPickedUp){
+            monsterLives -= 40;
+        }else{
+             monsterLives -= 20;
+        }
+       
         *combatEnded = 0;
     }else{
         printf("You try to hit, but fail miserably.\nYou lose 20 lives\n");
