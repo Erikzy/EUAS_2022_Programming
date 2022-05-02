@@ -282,7 +282,7 @@ song * parseLine(char * line,int * highestID){
             case 2:
                 strcpy(newSong->title, token);
             break;    
-            defaut:
+            default:
             break;          
         }
         //get next token
