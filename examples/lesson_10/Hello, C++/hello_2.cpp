@@ -8,7 +8,7 @@ int main(){
     cin >> name;
     cout << "Hello, " << name << " and welcome to the perilous road of C++!" << endl;
     cout << "Take the teachings of OOP and C++ as weapons to slay boredom of players" << endl;
-    cout << "  " endl;
+    cout << "  " << endl;
     
     
  return 0;
