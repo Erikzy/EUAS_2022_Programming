@@ -49,7 +49,7 @@ void get_user_choice(){
 void start_add_prompt(){
     char  input[50];
     int year = 0;
-    book_t * book = malloc(sizeof(book_t));
+    book_t * book = (book_t *)malloc(sizeof(book_t));
     
     printf("Please enter the title: ");
     scanf(" %s", (char *)&input);
